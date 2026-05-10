@@ -179,6 +179,12 @@ struct ContentView: View {
                     } label: {
                         Label("Bottom Wave Vertical", systemImage: "waveform.path.ecg")
                     }
+
+                    NavigationLink {
+                        LiquidBlockDemo()
+                    } label: {
+                        Label("Liquid Block", systemImage: "rectangle.inset.filled")
+                    }
                 }
             }
             .navigationTitle("Metalism")
