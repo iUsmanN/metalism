@@ -163,6 +163,18 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
+                        ListBlobTextDemo()
+                    } label: {
+                        Label("List Blob Text", systemImage: "character.cursor.ibeam")
+                    }
+
+                    NavigationLink {
+                        ListBlobTanDemo()
+                    } label: {
+                        Label("List Blob Tan", systemImage: "circle.dotted.and.circle")
+                    }
+
+                    NavigationLink {
                         ListBlobSquareDemo()
                     } label: {
                         Label("List Blob Square", systemImage: "square.inset.filled")

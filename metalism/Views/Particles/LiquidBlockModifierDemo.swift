@@ -43,7 +43,7 @@ struct LiquidBlockModifierDemo: View {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                // ── Invisible ScrollView ──────────────────────────────────────
+//                // ── Invisible ScrollView ──────────────────────────────────────
                 ScrollView {
                     GeometryReader { inner in
                         Color.clear

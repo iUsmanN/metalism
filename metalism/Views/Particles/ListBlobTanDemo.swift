@@ -1,21 +1,23 @@
 //
-//  ListBlobDemo.swift
+//  ListBlobTanDemo.swift
 //  metalism
 //
-//  A scrollable word list with a plain circle blob fixed in the centre
-//  of the screen, floating above the list content.
+//  Copy of ListBlobTextDemo using the tan-curve blob edge shader.
+//  Refraction and distortion follow a U-shaped tan profile over the outer
+//  20% ring: maximum at both the 80% and 100% diameter marks, reduced
+//  at the midpoint of the ring (~90%).
 //
 
 import SwiftUI
 
-private struct ListBlobScrollKey: PreferenceKey {
+private struct ListBlobTanScrollKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
 }
 
-struct ListBlobDemo: View {
+struct ListBlobTanDemo: View {
 
     @State private var scrollOffset: CGFloat = 0
 
@@ -45,17 +47,19 @@ struct ListBlobDemo: View {
                     GeometryReader { inner in
                         Color.clear
                             .preference(
-                                key: ListBlobScrollKey.self,
-                                value: -inner.frame(in: .named("listBlob")).minY
+                                key: ListBlobTanScrollKey.self,
+                                value: -inner.frame(in: .named("listBlobTan")).minY
                             )
                     }
                     .frame(height: totalHeight)
                 }
-                .coordinateSpace(name: "listBlob")
-                .onPreferenceChange(ListBlobScrollKey.self) { scrollOffset = $0 }
+                .coordinateSpace(name: "listBlobTan")
+                .onPreferenceChange(ListBlobTanScrollKey.self) { scrollOffset = $0 }
 
-                // ── List canvas with blob-edge CA shader ──────────────────
+                // ── List canvas with tan blob-edge shader ─────────────────
                 let centre = CGPoint(x: size.width / 2, y: size.height / 2)
+                // ringWidth = outer 40% of radius (60% → 100%)
+                let ringWidth = circleRadius * 0.4
 
                 Canvas { ctx, canvasSize in
                     // Dark background
@@ -64,36 +68,36 @@ struct ListBlobDemo: View {
                         with: .color(Color(white: 0.07))
                     )
 
-                    // Separator lines + word rows
+                    // Word rows
                     for (i, word) in words.enumerated() {
                         let screenY = CGFloat(i) * rowHeight - scrollOffset
 
                         guard screenY + rowHeight > 0, screenY < canvasSize.height else { continue }
 
-                        // Pseudo-random hue based on row index
+                        // Pseudo-random hue per row
                         let hue = Double(i * 137 % 360) / 360.0
-                        let circleColor = Color(hue: hue, saturation: 0.75, brightness: 0.95)
-                        let circleDiameter: CGFloat = 28
-                        let circleX = canvasSize.width / 2 - circleDiameter / 2
-                        let circleY = screenY + rowHeight / 2 - circleDiameter / 2
-                        ctx.fill(
-                            Path(ellipseIn: CGRect(x: circleX, y: circleY,
-                                                   width: circleDiameter, height: circleDiameter)),
-                            with: .color(circleColor)
+                        let textColor = Color(hue: hue, saturation: 0.65, brightness: 1.0)
+
+                        ctx.draw(
+                            Text(word)
+                                .font(.system(size: 20, weight: .semibold, design: .monospaced))
+                                .foregroundStyle(textColor),
+                            at: CGPoint(x: canvasSize.width / 2, y: screenY + rowHeight / 2),
+                            anchor: .center
                         )
                     }
                 }
                 .allowsHitTesting(false)
                 .layerEffect(
-                    ShaderLibrary.blobEdge(
+                    ShaderLibrary.blobEdgeTan(
                         .float2(Float(centre.x), Float(centre.y)),
                         .float(Float(circleRadius)),
-                        .float(28.0)   // ring width in points
+                        .float(Float(ringWidth))
                     ),
                     maxSampleOffset: CGSize(width: 60, height: 60)
                 )
 
-                // ── Circle blob fixed at screen centre ─────────────────────
+                // ── Circle blob outline fixed at screen centre ─────────────
                 Circle()
                     .fill(Color.white.opacity(0.0))
                     .overlay(
@@ -102,7 +106,7 @@ struct ListBlobDemo: View {
                                 .strokeBorder(Color.white.opacity(0.1), lineWidth: 1.5)
                             Circle()
                                 .strokeBorder(Color.white.opacity(0.05), lineWidth: 1.5)
-                                .scaleEffect(0.75)
+                                .scaleEffect(0.6)
                         }
                     )
                     .frame(width: circleRadius * 2, height: circleRadius * 2)
@@ -114,5 +118,5 @@ struct ListBlobDemo: View {
 }
 
 #Preview {
-    ListBlobDemo()
+    ListBlobTanDemo()
 }

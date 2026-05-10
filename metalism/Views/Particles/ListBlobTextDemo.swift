@@ -1,21 +1,21 @@
 //
-//  ListBlobDemo.swift
+//  ListBlobTextDemo.swift
 //  metalism
 //
 //  A scrollable word list with a plain circle blob fixed in the centre
-//  of the screen, floating above the list content.
+//  of the screen, floating above the list content. Words are drawn as text.
 //
 
 import SwiftUI
 
-private struct ListBlobScrollKey: PreferenceKey {
+private struct ListBlobTextScrollKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
 }
 
-struct ListBlobDemo: View {
+struct ListBlobTextDemo: View {
 
     @State private var scrollOffset: CGFloat = 0
 
@@ -45,14 +45,14 @@ struct ListBlobDemo: View {
                     GeometryReader { inner in
                         Color.clear
                             .preference(
-                                key: ListBlobScrollKey.self,
-                                value: -inner.frame(in: .named("listBlob")).minY
+                                key: ListBlobTextScrollKey.self,
+                                value: -inner.frame(in: .named("listBlobText")).minY
                             )
                     }
                     .frame(height: totalHeight)
                 }
-                .coordinateSpace(name: "listBlob")
-                .onPreferenceChange(ListBlobScrollKey.self) { scrollOffset = $0 }
+                .coordinateSpace(name: "listBlobText")
+                .onPreferenceChange(ListBlobTextScrollKey.self) { scrollOffset = $0 }
 
                 // ── List canvas with blob-edge CA shader ──────────────────
                 let centre = CGPoint(x: size.width / 2, y: size.height / 2)
@@ -64,7 +64,7 @@ struct ListBlobDemo: View {
                         with: .color(Color(white: 0.07))
                     )
 
-                    // Separator lines + word rows
+                    // Word rows
                     for (i, word) in words.enumerated() {
                         let screenY = CGFloat(i) * rowHeight - scrollOffset
 
@@ -72,14 +72,14 @@ struct ListBlobDemo: View {
 
                         // Pseudo-random hue based on row index
                         let hue = Double(i * 137 % 360) / 360.0
-                        let circleColor = Color(hue: hue, saturation: 0.75, brightness: 0.95)
-                        let circleDiameter: CGFloat = 28
-                        let circleX = canvasSize.width / 2 - circleDiameter / 2
-                        let circleY = screenY + rowHeight / 2 - circleDiameter / 2
-                        ctx.fill(
-                            Path(ellipseIn: CGRect(x: circleX, y: circleY,
-                                                   width: circleDiameter, height: circleDiameter)),
-                            with: .color(circleColor)
+                        let textColor = Color(hue: hue, saturation: 0.65, brightness: 1.0)
+
+                        ctx.draw(
+                            Text(word)
+                                .font(.system(size: 20, weight: .semibold, design: .monospaced))
+                                .foregroundStyle(textColor),
+                            at: CGPoint(x: canvasSize.width / 2, y: screenY + rowHeight / 2),
+                            anchor: .center
                         )
                     }
                 }
@@ -114,5 +114,5 @@ struct ListBlobDemo: View {
 }
 
 #Preview {
-    ListBlobDemo()
+    ListBlobTextDemo()
 }
