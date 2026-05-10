@@ -175,6 +175,12 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
+                        ListTanBlob2Demo()
+                    } label: {
+                        Label("List Tan Blob 2", systemImage: "circle.dotted.and.circle")
+                    }
+
+                    NavigationLink {
                         ListBlobSquareDemo()
                     } label: {
                         Label("List Blob Square", systemImage: "square.inset.filled")
