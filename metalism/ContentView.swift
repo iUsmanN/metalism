@@ -185,6 +185,12 @@ struct ContentView: View {
                     } label: {
                         Label("Liquid Block", systemImage: "rectangle.inset.filled")
                     }
+
+                    NavigationLink {
+                        LiquidBlockModifierDemo()
+                    } label: {
+                        Label("Liquid Block Modifier", systemImage: "rectangle.3.group.fill")
+                    }
                 }
             }
             .navigationTitle("Metalism")

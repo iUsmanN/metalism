@@ -26,14 +26,13 @@ half4 liquidBlock(float2 position,
     float2 delta = position - centre;
     float  sdf   = rrectSDF(delta, halfExtents, cornerRadius);
 
-    // Outside the rect — untouched
+    // Outside the rect — return original pixel untouched
     if (sdf > 0.0) {
         return layer.sample(position);
     }
 
     // Normalised depth: 0 = centre, 1 = edge
     float maxDist = min(halfExtents.x, halfExtents.y);
-    float depthN  = 1.0 - clamp(-sdf / maxDist, 0.0, 1.0);
 
     // Outward normal via SDF gradient
     float eps = 1.0;
@@ -50,16 +49,12 @@ half4 liquidBlock(float2 position,
     float distFromEdge = -sdf;
     float t = 1.0 - smoothstep(0.0, ringWidth, distFromEdge);
 
-    // ── Edge: refraction + warp ───────────────────────────────────────────────
-    float2 refrOffset = 1.0;//-radial * (t * t * 16.0);
-    float2 warpOffset = 0.0;//tangent * (t * (1.0 - t) * 10.0);
-    float2 sampleBase = position + refrOffset + warpOffset;
+    float2 sampleBase = position;
 
     // ── Gaussian blur — separable 5×5 kernel, sigma ≈ 8 px ───────────────────
-    // Weights for offsets [-2,-1,0,1,2] * step
     const float sigma   = 8.0;
-    const float step    = sigma * 0.8;   // tap spacing
-    const float w0      = 0.2270;        // exp(-0/(2*sigma^2)), normalised
+    const float step    = sigma * 0.8;
+    const float w0      = 0.2270;
     const float w1      = 0.1945;
     const float w2      = 0.1216;
     const int   HALF    = 2;
