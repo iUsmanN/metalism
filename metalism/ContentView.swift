@@ -136,9 +136,9 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
-                        ListBlobSquareDemo()
+                        ListBlobSquareTanDemo()
                     } label: {
-                        Label("List Blob Square", systemImage: "square.inset.filled")
+                        Label("List Bent Pyramid", systemImage: "square.inset.filled")
                     }
                     NavigationLink {
                         LiquidBlockDemo()
