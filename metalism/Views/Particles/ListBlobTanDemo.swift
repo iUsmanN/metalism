@@ -92,9 +92,10 @@ struct ListBlobTanDemo: View {
                     ShaderLibrary.blobEdgeTan(
                         .float2(Float(centre.x), Float(centre.y)),
                         .float(Float(circleRadius)),
-                        .float(Float(ringWidth))
+                        .float(Float(ringWidth)),
+                        .float(Float(scrollOffset))
                     ),
-                    maxSampleOffset: CGSize(width: 60, height: 60)
+                    maxSampleOffset: CGSize(width: 80, height: 80)
                 )
 
                 // ── Circle blob outline fixed at screen centre ─────────────
