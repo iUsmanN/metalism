@@ -91,7 +91,7 @@ struct LiquidBlockDemo: View {
 
                 // ── Rounded rect stroke overlay ───────────────────────────────
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Color.white.opacity(0.15), lineWidth: 1.5)
+                    .strokeBorder(Color.white.opacity(0.05), lineWidth: 1.5)
                     .frame(width: blockWidth, height: blockHeight)
                     .allowsHitTesting(false)
             }
