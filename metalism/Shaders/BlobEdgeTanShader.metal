@@ -126,16 +126,14 @@ half4 blobEdgeTan(float2 position,
     // Scale by tanNorm so highlight follows the U-curve within the ring
     specColor *= tanNorm;
 
-    // ── Ring darkness ─────────────────────────────────────────────────────────
-    // A smooth dimming that peaks in the middle of the ring (u≈0.5) and fades
-    // to zero at both the inner (60%) and outer (100%) edges.
-    // sin(u*π) is exactly 0 at u=0 and u=1, and 1 at u=0.5.
-    float ringDark  = sin(u * 3.14159) * 0.55;   // max ~55% darkness at mid-ring
-    float3 darkened = distorted * (1.0 - ringDark);
-
-    float3 finalColor = saturate(darkened + specColor);
+    // ── Uniform 20% darkness across the full 60–100% ring ────────────────────
+    // Applied flat — no sin modulation — so every pixel in the ring is equally dimmed.
+    float3 dimmed     = distorted * 1.20;
+    float3 finalColor = saturate(dimmed + specColor);
 
     half4 original = layer.sample(position);
+    // Blend the darkened+specular result against the original using tanNorm,
+    // so the effect still fades in smoothly at the ring boundaries.
     float3 blended = mix(float3(original.rgb), finalColor, tanNorm);
 
     return half4(half3(blended), 1.0h);
