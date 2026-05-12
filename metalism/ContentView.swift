@@ -47,6 +47,7 @@ struct ContentView: View {
                         Label("Wave Stretch", systemImage: "arrow.up.and.down.square")
                     }
                 }
+                .listItemTint(.primary)
 
                 Section("Distortions & Warp") {
                     NavigationLink {
@@ -84,9 +85,6 @@ struct ContentView: View {
                     } label: {
                         Label("Switch Glow Directional", systemImage: "arrow.right.square")
                     }
-
-                    
-
                     NavigationLink {
                         RainbowListDemo()
                     } label: {
@@ -158,6 +156,7 @@ struct ContentView: View {
                         Label("Liquid Block Modifier", systemImage: "rectangle.3.group.fill")
                     }
                 }
+                .listItemTint(.primary)
                 Section("Particles") {
                     NavigationLink {
                         ParticlesDemo()
@@ -213,6 +212,7 @@ struct ContentView: View {
                         Label("God Rays", systemImage: "sun.horizon.fill")
                     }
                 }
+                .listItemTint(.primary)
             }
             .navigationTitle("Usman's Experiments")
             .toolbarTitleDisplayMode(.inline)
