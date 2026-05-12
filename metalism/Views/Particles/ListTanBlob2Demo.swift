@@ -17,7 +17,10 @@ private struct ListTanBlob2ScrollKey: PreferenceKey {
 struct ListTanBlob2Demo: View {
 
     @State private var scrollOffset: CGFloat = 0
-    @State private var blurRadius: CGFloat = -8
+    @State private var blurRadius: CGFloat = 28
+    @State private var refractionStr: CGFloat = 0.54
+    @State private var specularStr: CGFloat = 0.12
+    @State private var causticStr: CGFloat = 0.25
 
     private let words = [
         "HORIZON", "REFLECT", "MIRAGE", "CRYSTAL", "SHADOW",
@@ -30,6 +33,18 @@ struct ListTanBlob2Demo: View {
 
     private let rowHeight: CGFloat = 56
     private let circleRadius: CGFloat = 90
+
+    @ViewBuilder
+    private func sliderRow(_ label: String, value: Binding<CGFloat>, in range: ClosedRange<CGFloat>, format: String) -> some View {
+        HStack {
+            Text("\(label): \(format)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.white.opacity(0.7))
+                .frame(width: 140, alignment: .leading)
+            Slider(value: value, in: range)
+        }
+        .padding(.horizontal)
+    }
 
     var body: some View {
         GeometryReader { geo in
@@ -87,7 +102,10 @@ struct ListTanBlob2Demo: View {
                         .float(Float(circleRadius)),
                         .float(Float(ringWidth)),
                         .float(Float(scrollOffset)),
-                        .float(Float(blurRadius))
+                        .float(Float(blurRadius)),
+                        .float(Float(refractionStr)),
+                        .float(Float(specularStr)),
+                        .float(Float(causticStr))
                     ),
                     maxSampleOffset: CGSize(width: 120, height: 120)
                 )
@@ -110,12 +128,11 @@ struct ListTanBlob2Demo: View {
         }
         .ignoresSafeArea()
         .overlay(alignment: .bottom) {
-            VStack(spacing: 4) {
-                Text("Blur: \(Int(blurRadius))px")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.white.opacity(0.7))
-                Slider(value: $blurRadius, in: 0...120, step: 1)
-                    .padding(.horizontal)
+            VStack(spacing: 2) {
+                sliderRow("Blur", value: $blurRadius, in: 0...120, format: "\(Int(blurRadius))px")
+                sliderRow("Refraction", value: $refractionStr, in: 0...3, format: String(format: "%.2f", refractionStr))
+                sliderRow("Specular", value: $specularStr, in: 0...3, format: String(format: "%.2f", specularStr))
+                sliderRow("Caustic", value: $causticStr, in: 0...3, format: String(format: "%.2f", causticStr))
             }
             .padding(.bottom, 40)
             .padding(.horizontal)

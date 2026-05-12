@@ -79,6 +79,12 @@ struct ContentView: View {
                         Label("Switch Glow", systemImage: "switch.2")
                     }
 
+                    NavigationLink {
+                        SwitchGlowDirectionalDemo()
+                    } label: {
+                        Label("Switch Glow Directional", systemImage: "arrow.right.square")
+                    }
+
                     
 
                     NavigationLink {
