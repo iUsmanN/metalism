@@ -140,6 +140,24 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
+                        ListBlobBinaryDemo()
+                    } label: {
+                        Label("List Blob Binary", systemImage: "01.circle")
+                    }
+
+                    NavigationLink {
+                        BitCloudDemo()
+                    } label: {
+                        Label("Bit Cloud", systemImage: "cloud.fill")
+                    }
+
+                    NavigationLink {
+                        WarpedListDemo()
+                    } label: {
+                        Label("Warped List", systemImage: "wave.3.right")
+                    }
+
+                    NavigationLink {
                         ListBlobSquareTanDemo()
                     } label: {
                         Label("List Bent Pyramid", systemImage: "square.inset.filled")
