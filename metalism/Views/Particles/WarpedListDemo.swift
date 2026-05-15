@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-private struct WarpedListScrollKey: PreferenceKey {
+private struct ScrollOffsetKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
@@ -19,62 +19,72 @@ struct WarpedListDemo: View {
     private let warpAmt: Float = 1.2
     private let saturation: Float = 0.8
 
-    private let words = [
-        "HORIZON", "REFLECT", "MIRAGE", "CRYSTAL", "SHADOW",
-        "FRACTAL", "AURORA", "CASCADE", "PRISM",  "VORTEX",
-        "SIGNAL",  "VECTOR", "MOTION", "RIPPLE",  "STATIC",
-        "FATHOM",  "ZENITH", "VERTEX", "RADIAL",  "OBLIQUE"
+    private let images: [(name: String, aspectRatio: CGFloat)] = [
+        ("1", 4000 / 2660),
+        ("2", 3000 / 2002),
+        ("3", 4000 / 2811),
+        ("4", 4096 / 3112),
+        ("5", 3840 / 2400),
+        ("6", 7798 / 5201),
     ]
 
-    private let rowHeight: CGFloat = 56
+    private func layout(width: CGFloat) -> [(y: CGFloat, height: CGFloat)] {
+        var result: [(CGFloat, CGFloat)] = []
+        var y: CGFloat = 0
+        for img in images {
+            let h = width / img.aspectRatio
+            result.append((y, h))
+            y += h
+        }
+        return result
+    }
 
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let totalHeight = CGFloat(words.count) * rowHeight
+            let items = layout(width: size.width)
+            let totalHeight = items.last.map { $0.y + $0.height } ?? size.height
 
             ZStack {
-                Color(uiColor: .systemBackground).ignoresSafeArea()
-
-                // Invisible ScrollView — drives scrollOffset only
+                // Invisible scroll view — only drives scrollOffset
                 ScrollView {
                     GeometryReader { inner in
-                        Color.clear
-                            .preference(
-                                key: WarpedListScrollKey.self,
-                                value: -inner.frame(in: .named("warpedList")).minY
-                            )
+                        Color.clear.preference(
+                            key: ScrollOffsetKey.self,
+                            value: -inner.frame(in: .named("scroll")).minY
+                        )
                     }
                     .frame(height: totalHeight)
                 }
-                .coordinateSpace(name: "warpedList")
-                .onPreferenceChange(WarpedListScrollKey.self) { scrollOffset = $0 }
+                .coordinateSpace(name: "scroll")
+                .onPreferenceChange(ScrollOffsetKey.self) { scrollOffset = $0 }
 
-                // Canvas renders the list rows and receives the shader
+                // Canvas with images as symbols — resolved once, drawn each frame
                 Canvas { ctx, canvasSize in
-                    ctx.fill(
-                        Path(CGRect(origin: .zero, size: canvasSize)),
-                        with: .color(Color(uiColor: .systemBackground))
-                    )
+                    for (i, img) in images.enumerated() {
+                        let (originY, height) = items[i]
+                        let screenY = originY - scrollOffset
+                        guard screenY + height > 0, screenY < canvasSize.height else { continue }
 
-                    for (i, word) in words.enumerated() {
-                        let screenY = CGFloat(i) * rowHeight - scrollOffset
-                        guard screenY + rowHeight > 0, screenY < canvasSize.height else { continue }
-
-                        let hue = Double(i * 137 % 360) / 360.0
-                        ctx.draw(
-                            Text(word)
-                                .font(.system(size: 22, weight: .semibold, design: .monospaced))
-                                .foregroundStyle(Color(hue: hue, saturation: 0.7, brightness: 1.0)),
-                            at: CGPoint(x: 20, y: screenY + rowHeight / 2),
-                            anchor: .leading
-                        )
-
-                        let divY = screenY + rowHeight - 0.5
-                        ctx.fill(
-                            Path(CGRect(x: 0, y: divY, width: canvasSize.width, height: 0.5)),
-                            with: .color(Color.primary.opacity(0.1))
-                        )
+                        if let symbol = ctx.resolveSymbol(id: img.name) {
+                            let rect = CGRect(x: 0, y: screenY,
+                                             width: canvasSize.width, height: height)
+                            ctx.drawLayer { child in
+                                child.clip(to: Path(rect))
+                                child.draw(symbol, in: rect)
+                            }
+                        }
+                    }
+                } symbols: {
+                    // Each image pre-rendered at correct size — SwiftUI caches these
+                    ForEach(images, id: \.name) { img in
+                        Image(img.name)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: size.width,
+                                   height: size.width / img.aspectRatio)
+                            .clipped()
+                            .tag(img.name)
                     }
                 }
                 .layerEffect(
@@ -85,7 +95,6 @@ struct WarpedListDemo: View {
                     ),
                     maxSampleOffset: CGSize(width: 0, height: 60)
                 )
-                .ignoresSafeArea()
                 .allowsHitTesting(false)
             }
         }

@@ -158,6 +158,24 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
+                        RevealGridRandomDemo()
+                    } label: {
+                        Label("Reveal Grid Random", systemImage: "square.grid.3x3.fill")
+                    }
+
+                    NavigationLink {
+                        RevealGridSequentialDemo()
+                    } label: {
+                        Label("Reveal Grid Sequential", systemImage: "square.grid.3x3")
+                    }
+
+                    NavigationLink {
+                        RevealGridDiamondDemo()
+                    } label: {
+                        Label("Reveal Grid Diamond", systemImage: "diamond")
+                    }
+
+                    NavigationLink {
                         ListBlobSquareTanDemo()
                     } label: {
                         Label("List Bent Pyramid", systemImage: "square.inset.filled")
