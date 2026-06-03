@@ -146,6 +146,12 @@ struct ContentView: View {
                     }
 
                     NavigationLink {
+                        FullScreenBinaryCoverDemo()
+                    } label: {
+                        Label("Full Screen Binary Cover", systemImage: "01.circle.fill")
+                    }
+
+                    NavigationLink {
                         BitCloudDemo()
                     } label: {
                         Label("Bit Cloud", systemImage: "cloud.fill")
@@ -173,6 +179,24 @@ struct ContentView: View {
                         RevealGridDiamondDemo()
                     } label: {
                         Label("Reveal Grid Diamond", systemImage: "diamond")
+                    }
+
+                    NavigationLink {
+                        RevealGridZoomDemo()
+                    } label: {
+                        Label("Reveal Grid Zoom", systemImage: "arrow.down.right.and.arrow.up.left")
+                    }
+
+                    NavigationLink {
+                        WrittenTextDemo()
+                    } label: {
+                        Label("Written Text", systemImage: "keyboard")
+                    }
+
+                    NavigationLink {
+                        ChromaticAberrationDemo()
+                    } label: {
+                        Label("Chromatic Aberration", systemImage: "camera.filters")
                     }
 
                     NavigationLink {

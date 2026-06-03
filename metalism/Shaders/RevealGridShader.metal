@@ -41,6 +41,53 @@ half4 revealGrid(float2 position,
     return half4(rgb, color.a);
 }
 
+// distortionEffect: each cell flies in from its nearest corner of the rect.
+// Returns the source pixel position to sample from.
+[[ stitchable ]]
+float2 revealGridZoom(float2 position,
+                      float2 size,
+                      float  progress,
+                      float  cols,
+                      float  rows)
+{
+    float2 uv  = position / size;
+    float  col = float(int(uv.x * cols));
+    float  row = float(int(uv.y * rows));
+
+    // Cell bounds and centre in pixel space
+    float cellW = size.x / cols;
+    float cellH = size.y / rows;
+    float2 cellCentre = float2(col * cellW + cellW * 0.5,
+                               row * cellH + cellH * 0.5);
+
+    // Nearest corner direction: sign of (cellCentre - rect centre)
+    float2 rectCentre = size * 0.5;
+    float2 cornerDir  = sign(cellCentre - rectCentre);
+    // Ensure cells exactly on the centre axis still get a direction
+    if (cornerDir.x == 0.0) cornerDir.x = 1.0;
+    if (cornerDir.y == 0.0) cornerDir.y = 1.0;
+
+    // Random delay per cell
+    float cellIdx = row * cols + col;
+    float h = fract(sin(cellIdx * 127.1 + cols * 311.7 + rows * 74.3) * 43758.5453);
+    float stagger = 0.6;
+    float delay   = h * stagger;
+    float window  = 0.4;
+    float local   = saturate((progress - delay) / window);
+
+    // Ease-out curve
+    float t = 1.0 - (1.0 - local) * (1.0 - local);
+
+    // At t=0: cell is displaced one full rect-size toward its corner
+    // At t=1: cell is in its correct position (offset = 0)
+    float2 startOffset = cornerDir * size * (1.0 - t);
+
+    // Local position within cell (unchanged — no scale, just translation)
+    float2 samplePos = position + startOffset;
+
+    return samplePos;
+}
+
 [[ stitchable ]]
 half4 revealGridDiamond(float2 position,
                         half4  color,

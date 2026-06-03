@@ -1,24 +1,24 @@
 //
-//  RevealGridRandomDemo.swift
+//  RevealGridZoomDemo.swift
 //  metalism
 //
 
 import SwiftUI
 
-struct RevealGridRandomDemo: View {
+struct RevealGridZoomDemo: View {
 
     var cols: Int = 15
     var rows: Int = 15
 
     @State private var startTime: Date = .now
-    private let duration: Double = 0.8
+    private let duration: Double = 1.8
     private let pause:    Double = 0.5
 
     var body: some View {
         GeometryReader { geo in
             let screenSize = geo.size
-            let rectW = screenSize.width * 0.9
-            let rectH = screenSize.width * 0.9
+            let rectW = 300.0
+            let rectH = 300.0
 
             TimelineView(.animation) { tl in
                 let cycle    = duration + pause
@@ -31,25 +31,26 @@ struct RevealGridRandomDemo: View {
                     Rectangle()
                         .fill(Color.red)
                         .frame(width: rectW, height: rectH)
-                        .colorEffect(
-                            ShaderLibrary.revealGrid(
+                        .distortionEffect(
+                            ShaderLibrary.revealGridZoom(
                                 .float2(Float(rectW), Float(rectH)),
                                 .float(progress),
                                 .float(Float(cols)),
                                 .float(Float(rows))
-                            )
+                            ),
+                            maxSampleOffset: CGSize(width: rectW, height: rectH)
                         )
                 }
             }
         }
         .ignoresSafeArea()
-        .navigationTitle("Reveal Grid Random")
+        .navigationTitle("Reveal Grid Zoom")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
     NavigationStack {
-        RevealGridRandomDemo(cols: 8, rows: 8)
+        RevealGridZoomDemo()
     }
 }
